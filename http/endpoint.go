@@ -32,7 +32,7 @@ func (e *endpoint) Method() string {
 	return e.method
 }
 
-func NewEndpoints(baseURL, path, method string) (Endpoint, error) {
+func NewEndpoint(baseURL, path, method string) (Endpoint, error) {
 	u, err := url.Parse(baseURL + path)
 	if err != nil {
 		return nil, err
