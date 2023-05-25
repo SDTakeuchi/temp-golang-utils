@@ -1,9 +1,10 @@
 package http
 
 import (
+	"bytes"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -14,7 +15,7 @@ type (
 		Do(e Endpoint, header, body map[string]string) (string, error)
 	}
 	client struct {
-		timeout  time.Duration
+		timeout time.Duration
 	}
 )
 
@@ -23,10 +24,11 @@ func NewClient(timeout time.Duration) Client {
 		timeout = defaultTimeout
 	}
 	return &client{
-		timeout:  timeout,
+		timeout: timeout,
 	}
 }
 
+// Do executes the request, sends body in json style
 func (c *client) Do(e Endpoint, header, body map[string]string) (string, error) {
 	// init http client
 	client := &http.Client{
@@ -34,17 +36,16 @@ func (c *client) Do(e Endpoint, header, body map[string]string) (string, error) 
 	}
 
 	// prepare body
-	var bodyString string
-	for k, v := range body {
-		bodyString += k + "=" + v + "&"
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return "", err
 	}
-	bodyString = strings.TrimSuffix(bodyString, "&")
-	bodyParam := strings.NewReader(bodyString)
+	param := bytes.NewReader(bodyBytes)
 
 	req, err := http.NewRequest(
 		e.Method(),
 		e.URL().String(),
-		bodyParam,
+		param,
 	)
 	if err != nil {
 		return "", err
