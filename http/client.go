@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -40,6 +41,7 @@ func (c *client) Do(e Endpoint, header, body map[string]string) (string, error) 
 	if err != nil {
 		return "", err
 	}
+	fmt.Printf("request body: %s\n", string(bodyBytes))
 	param := bytes.NewReader(bodyBytes)
 
 	req, err := http.NewRequest(
